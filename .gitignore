@@ -6,5 +6,9 @@ roadmap.md
 # Vagrant
 .vagrant/
 
+# IDEs
+.idea/
+.vscode/
+
 # macOS
 .DS_Store
