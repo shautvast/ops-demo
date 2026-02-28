@@ -1,0 +1,10 @@
+# AI session / planning files — local only, not for participants
+CLAUDE.md
+sessions.md
+roadmap.md
+
+# Vagrant
+.vagrant/
+
+# macOS
+.DS_Store
