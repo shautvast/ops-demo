@@ -7,6 +7,7 @@
 | 01 | Bootstrap ArgoCD | Core | 30 min | ✅ Implemented |
 | 02 | Deploy podinfo via GitOps | Core | 30 min | ✅ Implemented |
 | 03 | MetalLB + Ingress-Nginx (LAN exposure) | Core | 45 min | ✅ Implemented |
+| 03b | Cloudflare Tunnel voor webhooks | Bonus | 30–45 min | ✅ Implemented |
 | 04 | Tekton pipeline (image tag bump → GitOps loop) | Core | 45 min | ✅ Implemented |
 | 05 | App upgrade via GitOps | Core | 15 min | ✅ Implemented |
 | 06 | Monitoring: Prometheus + Grafana | Bonus | 60 min | ✅ Implemented |
@@ -24,6 +25,7 @@ Model: solution branches are **standalone per exercise** (not cumulative).
 | `solution/01-argocd-bootstrap` | ArgoCD running, root app applied |
 | `solution/02-deploy-podinfo` | podinfo synced via ArgoCD |
 | `solution/03-metallb-ingress` | MetalLB + Ingress-Nginx + podinfo reachable on LAN; CRD `caBundle` drift handling included |
+| `solution/03b-cloudflare-tunnel` | Cloudflared tunnel connector manifests met token placeholders |
 | `solution/04-tekton-pipeline` | Full Tekton GitOps loop working |
 | `solution/05-app-upgrade` | deployment.yaml bumped to 6.7.0 |
 | `solution/06-monitoring` | Prometheus + Grafana running |
