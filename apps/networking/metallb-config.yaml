@@ -8,7 +8,7 @@ metadata:
 spec:
   project: workshop
   source:
-    repoURL: JOUW_FORK_URL
+    repoURL: https://github.com/shautvast/ops-demo
     targetRevision: HEAD
     path: manifests/networking/metallb
     directory:
