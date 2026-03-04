@@ -134,5 +134,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision "shell", inline: $provision, privileged: true
-  config.vm.network "forwarded_port", guest: 9898, host: 9898
 end
