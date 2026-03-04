@@ -49,6 +49,7 @@ Maak de volgende bestanden aan:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Dit is de Helm-values file voor MetalLB.
 > - In deze workshop-VM kun je hem leeg laten; de standaard chart-values zijn genoeg.
 
@@ -60,6 +61,7 @@ Maak de volgende bestanden aan:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - `IPAddressPool` bepaalt uit welke range MetalLB IP's mag uitdelen.
 > - `L2Advertisement` maakt die pool zichtbaar op je host-only netwerk via ARP.
 > - Daardoor kan je laptop services op dat IP direct bereiken.
@@ -88,6 +90,7 @@ spec:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Installeert MetalLB via ArgoCD als aparte `Application`.
 > - De chart komt van de upstream Helm repo; jouw repo levert de values via `$values/...`.
 > - `sync-wave: "1"` zorgt dat MetalLB eerst klaar is.
@@ -134,6 +137,7 @@ spec:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Past jouw IP-pool/L2-config toe als losse ArgoCD `Application`.
 > - Die split houdt "installatie" en "runtime-config" van MetalLB uit elkaar.
 > - `sync-wave: "2"` laat dit pas lopen nadat MetalLB zelf staat.
@@ -171,6 +175,7 @@ spec:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Zet ingress-nginx neer met een `LoadBalancer` service.
 > - Dat service-IP wordt vast op `192.168.56.200` gezet.
 > - Zo kun je stabiele hostnames gebruiken met `nip.io`.
@@ -193,6 +198,7 @@ controller:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Installeert ingress-nginx via ArgoCD.
 > - Ook hier: chart upstream, values uit jouw repo.
 > - `sync-wave: "3"` laat ingress pas starten nadat MetalLB + config klaar zijn.
@@ -214,7 +220,7 @@ spec:
       helm:
         valueFiles:
           - $values/manifests/networking/ingress-nginx/values.yaml
-    - repoURL: JOUW_FORK_URL
+    - repoURL: https://github.com/shautvast/ops-demo
       targetRevision: HEAD
       ref: values
   destination:
@@ -228,11 +234,12 @@ spec:
       - CreateNamespace=true
 ```
 
----
+## kubectl -n argocd patch application root --type merge -p '{"metadata":{"annotations":{"argocd.argoproj.io/refresh":"hard"}}}'
 
 ### 3. Alles committen en pushen
 
 > **HOST**
+>
 > ```bash
 > git add apps/networking/ manifests/networking/
 > git commit -m "feat: MetalLB + Ingress-Nginx"
@@ -242,6 +249,7 @@ spec:
 Wacht tot beide applications Synced zijn, en controleer dan:
 
 > **VM**
+>
 > ```bash
 > kubectl get svc -n ingress-nginx
 > # NAME                       TYPE           EXTERNAL-IP      PORT(S)
@@ -251,6 +259,7 @@ Wacht tot beide applications Synced zijn, en controleer dan:
 Vanuit je laptop:
 
 > **HOST**
+>
 > ```bash
 > curl http://192.168.56.200
 > # 404 van Nginx — klopt, nog geen Ingress-regel
@@ -268,6 +277,7 @@ Vanuit je laptop:
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Definieert de HTTP-route voor podinfo.
 > - `ingressClassName: nginx` bindt deze Ingress aan ingress-nginx.
 > - De hostnaam met `nip.io` wijst naar jouw MetalLB IP.
@@ -294,6 +304,7 @@ spec:
 ```
 
 > **HOST**
+>
 > ```bash
 > git add manifests/apps/podinfo/ingress.yaml
 > git commit -m "feat: voeg podinfo Ingress toe"
@@ -310,21 +321,23 @@ Pas `manifests/argocd/values.yaml` aan. Zoek het uitgecommentarieerde ingress-bl
 
 > [!TIP]
 > **Wat dit doet**
+>
 > - Schakelt ingress in voor de ArgoCD server zelf.
 > - Daarna kun je ArgoCD via browser-URL gebruiken in plaats van port-forward.
 > - De `hostname` moet matchen met het IP dat ingress-nginx exposeert.
 
 ```yaml
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hostname: argocd.192.168.56.200.nip.io
-    annotations:
-      nginx.ingress.kubernetes.io/ssl-passthrough: "false"
-      nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostname: argocd.192.168.56.200.nip.io
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 ```
 
 > **HOST**
+>
 > ```bash
 > git add manifests/argocd/values.yaml
 > git commit -m "feat: schakel ArgoCD ingress in"
@@ -348,13 +361,16 @@ speaker:
       operator: Exists
       effect: NoSchedule
 ```
+
 > [!TIP]
 > **Wat dit doet**
+>
 > - `tolerations` zijn alleen nodig als je cluster control-plane `NoSchedule` taints gebruikt.
 >
 > **Termen uitgelegd**
->- `speaker`: de MetalLB component die op nodes draait en op het netwerk "antwoordt" voor een toegewezen
->  LoadBalancer-IP (in L2-modus via ARP).
+>
+> - `speaker`: de MetalLB component die op nodes draait en op het netwerk "antwoordt" voor een toegewezen
+>   LoadBalancer-IP (in L2-modus via ARP).
 > - `tolerations`: een Kubernetes-mechanisme waarmee een pod toch op een node mag landen die een `taint` heeft.
 >   Control-plane nodes zijn vaak getaint met `NoSchedule`; zonder toleration wordt de speaker daar niet ingepland.
 
@@ -365,7 +381,7 @@ Commit en push daarna opnieuw, zodat ArgoCD MetalLB met deze values heruitrolt.
 ## Verwacht resultaat
 
 | URL                                  | App            |
-|--------------------------------------|----------------|
+| ------------------------------------ | -------------- |
 | http://podinfo.192.168.56.200.nip.io | podinfo v6.6.2 |
 | http://argocd.192.168.56.200.nip.io  | ArgoCD UI      |
 
@@ -376,7 +392,7 @@ Beide bereikbaar vanaf je laptop zonder port-forward.
 ## Probleemoplossing
 
 | Symptoom                              | Oplossing                                                                                                          |
-|---------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `EXTERNAL-IP` blijft `<pending>`      | MetalLB is nog niet klaar — check `kubectl get pods -n metallb-system`                                             |
 | curl naar 192.168.56.200 time-out     | VirtualBox host-only adapter niet geconfigureerd — zie vm-setup.md                                                 |
 | nip.io resolvet niet                  | Tijdelijk DNS-probleem, probeer opnieuw of voeg toe aan `/etc/hosts`                                               |
