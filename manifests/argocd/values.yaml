@@ -19,7 +19,6 @@ server:
     annotations:
       nginx.ingress.kubernetes.io/ssl-passthrough: "false"
       nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  ──────────────────────────────────────────────────────────────────────────
 
 configs:
   params:
